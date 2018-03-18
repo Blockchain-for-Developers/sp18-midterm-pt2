@@ -3,6 +3,8 @@ pragma solidity ^0.4.15;
 contract MultiSigWallet {
     address private _owner;
     mapping(address => uint8) private _owners;
+    //TODO: create an incrementing number for the owners so that uint8 has some value.
+    //      not quite sure what the mapping is for seems just fine as an array.
 
     mapping (uint => Transaction) private _transactions;
     uint[] private _pendingTransactions;
@@ -35,10 +37,10 @@ contract MultiSigWallet {
     /// @dev logged events
     event DepositFunds(address source, uint amount);
     /// @dev full sequence of the transaction event logged
-    event TransactionCreated(address source, address destination, uint value, uint transactionID);
-    event TransactionCompleted(address source, address destination, uint value, uint transactionID);
+    event TransactionCreated(address source, address destination, uint value, uint transactionId);
+    event TransactionCompleted(address source, address destination, uint value, uint transactionId);
     /// @dev keeps track of who is signing the transactions
-    event TransactionSigned(address by, uint transactionID);
+    event TransactionSigned(address by, uint transactionId);
 
 
     /// @dev Contract constructor sets initial owners
@@ -58,23 +60,25 @@ contract MultiSigWallet {
 
     /// @dev Fallback function, which accepts ether when sent to contract
     function () public payable {
+      if (msg.sender > 0){
         DepositFunds(msg.sender, msg.value);
+      }
     }
 
-    function withdraw(uint amount) public {
+    function withdraw(uint value) public {
       require(address(this).balance >= value);
       //YOUR CODE HERE
 
     }
 
-    /// @dev Send ether to specific a transaction
+    /// @dev Send ether to a specific desination
     /// @param destination Transaction target address.
     /// @param value Transaction ether value.
     ///
     /// Start by creating your transaction. Since we defined it as a struct,
     /// we need to define it in a memory context. Update the member attributes.
     ///
-    /// note, keep transactionID updated
+    /// note, keep transactionId updated
     function transferTo(address destination, uint value) validOwner public {
       require(address(this).balance >= value);
       //YOUR CODE HERE
@@ -94,7 +98,7 @@ contract MultiSigWallet {
       //YOUR CODE HERE
     }
 
-    //returns pending transcations
+    //returns pending transactions
     function getPendingTransactions() constant validOwner public returns (uint[]) {
       //YOUR CODE HERE
     }
@@ -102,7 +106,7 @@ contract MultiSigWallet {
     /// @dev Allows an owner to confirm a transaction.
     /// @param transactionId Transaction ID.
     /// Sign and Execute transaction.
-    function signTransaction(uint transactionID) validOwner public {
+    function signTransaction(uint transactionId) validOwner public {
       //Use Transaction Structure. Above in TransferTo function, because
       //we created the structure, we had to specify the keyword memory.
       //Now, we are pulling in the structure from a storage mechanism
